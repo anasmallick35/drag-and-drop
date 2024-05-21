@@ -1,18 +1,36 @@
 import React from 'react';
-import { useDrop } from 'react-dnd';
-import Item from './Item';
 import './container.css';
+import Item from './Item';
 
-const Container = ({ items, onDrop, containerType }) => {
-  const [, ref] = useDrop({
-    accept: 'ITEM',
-    drop: (item) => onDrop(item.name, item.containerType),
-  });
+const Container = ({ title, items, onDragOver, onDrop, onDragStart }) => {
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+    const newEvent = new DragEvent('drop', {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer: new DataTransfer(),
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    e.target.dispatchEvent(newEvent);
+  };
 
   return (
-    <div ref={ref} className="container">
+    <div
+      className="container"
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <h2>{title}</h2>
       {items.map((item, index) => (
-        <Item key={index} name={item} containerType={containerType} />
+        <Item key={index} item={item} onDragStart={onDragStart} />
       ))}
     </div>
   );

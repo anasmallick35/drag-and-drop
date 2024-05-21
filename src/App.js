@@ -1,37 +1,51 @@
 import React, { useState } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import Container from './container';
 import './App.css';
+import Container from './container';
 
-function App() {
+const App = () => {
   const [itemsA, setItemsA] = useState(['Item 1', 'Item 2', 'Item 3']);
   const [itemsB, setItemsB] = useState([]);
 
-  const handleDrop = (item, from, to) => {
-    if (from === to) {
-      return; 
-    }
+  const handleDragStart = (e, item) => {
+    e.dataTransfer.setData('text/plain', item);
+  };
 
-    if (from === 'A' && to === 'B') {
-      setItemsA((prevItemsA) => prevItemsA.filter((i) => i !== item));
-      setItemsB((prevItemsB) => [...prevItemsB, item]);
-    } else if (from === 'B' && to === 'A') {
-      setItemsB((prevItemsB) => prevItemsB.filter((i) => i !== item));
-      setItemsA((prevItemsA) => [...prevItemsA, item]);
-    }
-    console.log(`Item "${item}" moved from ${from} to ${to}`);
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDropA = (e) => {
+    const item = e.dataTransfer.getData('text/plain');
+    setItemsA((prevItems) => [...prevItems, item]);
+    setItemsB((prevItems) => prevItems.filter((i) => i !== item));
+    console.log(`Added to A: ${item}`);
+  };
+
+  const handleDropB = (e) => {
+    const item = e.dataTransfer.getData('text/plain');
+    setItemsB((prevItems) => [...prevItems, item]);
+    setItemsA((prevItems) => prevItems.filter((i) => i !== item));
+    console.log(`Added to B: ${item}`);
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="app">
-        <Container items={itemsA} onDrop={(item, from) => handleDrop(item, from, 'A')} containerType="A" />
-        <Container items={itemsB} onDrop={(item, from) => handleDrop(item, from, 'B')} containerType="B" />
-        <div id="arrow" className="arrow"></div>
-      </div>
-    </DndProvider>
+    <div className="app">
+      <Container
+        title="Container A"
+        items={itemsA}
+        onDragOver={handleDragOver}
+        onDrop={handleDropA}
+        onDragStart={handleDragStart}
+      />
+      <Container
+        title="Container B"
+        items={itemsB}
+        onDragOver={handleDragOver}
+        onDrop={handleDropB}
+        onDragStart={handleDragStart}
+      />
+    </div>
   );
-}
+};
 
 export default App;
