@@ -15,14 +15,18 @@ const App = () => {
   };
 
   const handleDropA = (e) => {
+    e.preventDefault();
     const item = e.dataTransfer.getData('text/plain');
+    if (itemsA.includes(item)) return;  
     setItemsA((prevItems) => [...prevItems, item]);
     setItemsB((prevItems) => prevItems.filter((i) => i !== item));
     console.log(`Added to A: ${item}`);
   };
 
   const handleDropB = (e) => {
+    e.preventDefault();
     const item = e.dataTransfer.getData('text/plain');
+    if (itemsB.includes(item)) return;  
     setItemsB((prevItems) => [...prevItems, item]);
     setItemsA((prevItems) => prevItems.filter((i) => i !== item));
     console.log(`Added to B: ${item}`);
